@@ -68,8 +68,8 @@ included it.</p>
 `,
 		*urlFlag,
 		lastDownloadTime.Format(fullDateFormat),
-		lastDownloadHash,
-		thisDownloadHash,
+		lastDownloadHash.Sum(),
+		thisDownloadHash.Sum(),
 	)
 }
 
@@ -113,6 +113,7 @@ func main() {
 			}
 			defer os.Remove(tmp.Name())
 
+			thisDownloadHash.Reset()
 			teedBody := io.TeeReader(resp.Body, thisDownloadHash)
 
 			sz, err := io.Copy(tmp, teedBody)
