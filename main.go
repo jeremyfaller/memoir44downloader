@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"flag"
 	"fmt"
+	"hash"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,20 +20,21 @@ import (
 var (
 	urlFlag      = flag.String("url", "https://www.daysofwonder.com/memoir44/en/mini-campaigns/remembrance", "url to download")
 	daemonFlag   = flag.Bool("deamon", true, "should this run as a daemon")
-	sleepFlag    = flag.Int("sleep", 10, "duration to this sleep in daemon mode")
+	sleepFlag    = flag.Int("sleep", 480, "duration to this sleep in daemon mode")
 	toFlag       = flag.String("to", os.Getenv("MEM44_TO_EMAIL"), "comma separated list of email addresses to send to")
 	sendMailFlag = flag.Bool("send", true, "should mail be sent")
 	smtpAcctFlag = flag.String("from", os.Getenv("MEM44_SMTP_ACCOUNT"), "smtp account holder")
 	smtpPassFlag = flag.String("password", os.Getenv("MEM44_SMTP_PASSWORD"), "smtp password")
 	smtpHostFlag = flag.String("host", "smtp.gmail.com", "smtp host")
 	smtpPortFlag = flag.Int("port", 587, "smtp port")
+	hashFileFlag = flag.String("hash", "~/.mem44hash", "where to store the last hash")
 )
 
 const fullDateFormat = "Jan 2 2006, 15:04:05"
 
 var (
 	lastDownloadTime = time.Now()
-	lastDownloadHash = sha256.New()
+	lastDownloadHash string
 	thisDownloadHash = sha256.New()
 )
 
@@ -57,7 +59,7 @@ included it.</p>
   </tr>
   <tr>
     <th>lastDownloadHash:</th>
-	<th>%x</th>
+	<th>%s</th>
   </tr>
   <tr>
     <th>thisDownloadHash:</th>
@@ -68,9 +70,13 @@ included it.</p>
 `,
 		*urlFlag,
 		lastDownloadTime.Format(fullDateFormat),
-		lastDownloadHash.Sum(nil),
+		lastDownloadHash,
 		thisDownloadHash.Sum(nil),
 	)
+}
+
+func convertHash(h hash.Hash) string {
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func main() {
@@ -81,6 +87,9 @@ func main() {
 
 	emails := strings.Split(*toFlag, ",")
 	sleepDur := time.Duration(*sleepFlag) * time.Minute
+
+	lastHash, _ := ioutil.ReadFile(*hashFileFlag)
+	lastDownloadHash = string(lastHash)
 
 	for {
 		func() {
@@ -122,7 +131,7 @@ func main() {
 			}
 			log.Printf("size: %d", sz)
 
-			if thisDownloadHash == lastDownloadHash {
+			if convertHash(thisDownloadHash) == lastDownloadHash {
 				log.Printf("hashes are equal, skipping download")
 				return
 			}
@@ -148,7 +157,8 @@ func main() {
 		if !*daemonFlag {
 			break
 		}
-		lastDownloadHash = thisDownloadHash
+		lastDownloadHash = convertHash(thisDownloadHash)
+		ioutil.WriteFile(*hashFileFlag, []byte(lastDownloadHash), 0600)
 		lastDownloadTime = time.Now()
 		log.Printf("sleeping till: %s", time.Now().Add(sleepDur).Format(fullDateFormat))
 		time.Sleep(sleepDur)
