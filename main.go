@@ -21,7 +21,7 @@ var (
 	daemonFlag   = flag.Bool("deamon", true, "should this run as a daemon")
 	sleepFlag    = flag.Int("sleep", 10, "duration to this sleep in daemon mode")
 	toFlag       = flag.String("to", os.Getenv("MEM44_TO_EMAIL"), "comma separated list of email addresses to send to")
-	sendMailFlag = flag.Bool("send", false, "should mail be sent")
+	sendMailFlag = flag.Bool("send", true, "should mail be sent")
 	smtpAcctFlag = flag.String("from", os.Getenv("MEM44_SMTP_ACCOUNT"), "smtp account holder")
 	smtpPassFlag = flag.String("password", os.Getenv("MEM44_SMTP_PASSWORD"), "smtp password")
 	smtpHostFlag = flag.String("host", "smtp.gmail.com", "smtp host")
