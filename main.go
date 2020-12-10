@@ -51,7 +51,7 @@ func body() string {
 <p>I am your friendly neighborhood Memoir '44 downloader. I download the Rememberance map on the
 <a href=%q>Days of Wonder</a> website. I thought you wanted this month's map; therefore, I've
 included it.</p>
-<p>Here are some stats about me. I hope you find these interesting.<p>
+<p>Here are some stats about me. I hope you find these interesting.</p>
 <table>
   <tr>
     <th>lastDownloadTime:</th>
