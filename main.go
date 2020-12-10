@@ -68,8 +68,8 @@ included it.</p>
 `,
 		*urlFlag,
 		lastDownloadTime.Format(fullDateFormat),
-		lastDownloadHash.Sum(),
-		thisDownloadHash.Sum(),
+		lastDownloadHash.Sum(nil),
+		thisDownloadHash.Sum(nil),
 	)
 }
 
