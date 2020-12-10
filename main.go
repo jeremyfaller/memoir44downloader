@@ -57,7 +57,7 @@ included it.</p>
   </tr>
   <tr>
     <th>lastDownloadHash:</th>
-	<th>%x/th>
+	<th>%x</th>
   </tr>
   <tr>
     <th>thisDownloadHash:</th>
